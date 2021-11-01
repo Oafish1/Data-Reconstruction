@@ -13,7 +13,7 @@ setup(
     description=readme,
     test_suite='tests',
     install_requires=[
-        'commando @ git+https://github.com/Oafish1/ComManDo',
+        'unioncom',
         'matplotlib',
         'numpy',
         'torch',

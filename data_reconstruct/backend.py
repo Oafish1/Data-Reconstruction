@@ -1,13 +1,21 @@
 from commando import ComManDo
 import torch
 import torch.nn as nn
+from unioncom.UnionCom import UnionCom
 
 from .model_classes import PredictionDataset
 
 
+USE_COMMANDO = False
+
+
 def joint_embed(*datasets, **hyperparams):
     """Perform joint embedding on any number of datasets"""
-    return ComManDo(**hyperparams).fit_transform([*datasets])
+    if USE_COMMANDO:
+        constructor_class = ComManDo
+    else:
+        constructor_class = UnionCom
+    return constructor_class(**hyperparams).fit_transform([*datasets])
 
 
 def create_dataloader(inputs, labels):

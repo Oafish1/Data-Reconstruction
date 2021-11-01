@@ -19,11 +19,11 @@ class PredictionDataset(torch.utils.data.Dataset):
 
 class Model(nn.Module):
     """Thin, simple NN model"""
-    def __init__(self, input_dim, output_dim, internal_dim=10):
+    def __init__(self, input_dim, output_dim, hidden_dim=10):
         super().__init__()
 
-        self.fc1 = nn.Linear(input_dim, internal_dim)
-        self.fc2 = nn.Linear(internal_dim, output_dim)
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
         """Forward pass for the model"""

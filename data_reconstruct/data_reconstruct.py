@@ -3,10 +3,19 @@ import warnings
 import torch
 
 from . import backend
+from . import model_classes
 
 
 DEFAULT_JOINT_EMBED_KWARGS = {
     'project_mode': 'tsne',
+    'epoch_pd': 2000,
+    'log_pd': 200,
+    'epoch_DNN': 100,
+    'log_DNN': 50,
+}
+DEFAULT_NN_KWARGS = {
+    'epochs': 100,
+    'log_epoch': 50,
 }
 
 
@@ -15,8 +24,10 @@ def run_pipeline(
     train_idx=None,
     validation_idx=None,
     embedding_dim=10,
-    embedding_kwargs=DEFAULT_JOINT_EMBED_KWARGS,
+    hidden_dim=10,
     output_cols=[0],
+    embedding_kwargs=DEFAULT_JOINT_EMBED_KWARGS,
+    nn_kwargs=DEFAULT_NN_KWARGS,
 ):
     """
     Run the full suite.  The last modality is the one to fill in while the first
@@ -32,8 +43,10 @@ def run_pipeline(
         warnings.warn('``train_idx`` was not defined, using size of first dataset instead')
     if validation_idx is None and len(datasets[-1]) > train_idx:
         validation_idx = len(datasets[-1])
-
-    maximal_idx = max(train_idx, validation_idx)
+    if validation_idx is not None:
+        maximal_idx = max(train_idx, validation_idx)
+    else:
+        maximal_idx = train_idx
     for i in range(len(datasets) - 1):
         assert len(datasets[i]) >= maximal_idx, \
             f'All datasets must have >= {maximal_idx} samples'
@@ -55,8 +68,8 @@ def run_pipeline(
     model_train_y = datasets[-1][:train_idx][:, output_cols]
 
     training_loader = backend.create_dataloader(model_train_X, model_train_y)
-    model = backend.Model(embedding_dim, len(output_cols))
-    backend.train_model(model, training_loader)
+    model = model_classes.Model(embedding_dim, len(output_cols), hidden_dim=hidden_dim)
+    backend.train_model(model, training_loader, **nn_kwargs)
 
     # Run validation
     if validation_idx is not None:
