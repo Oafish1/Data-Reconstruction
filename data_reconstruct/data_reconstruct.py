@@ -19,6 +19,30 @@ DEFAULT_NN_KWARGS = {
 }
 
 
+def anonymize(
+    *datasets,
+    embedding_dim=10,
+    embedding_kwargs=DEFAULT_JOINT_EMBED_KWARGS,
+):
+    """
+    Run the suite until embedding, functioning as anonymization without
+    specifically identifiable records.  Can be run on any number of datasets.
+    This is functionally equivalent to UnionCom.
+
+    Returns
+    -------
+    Tuple of embeddings generated from each dataset.  If only one embedding is
+    to be sent, it should be generated from the most reliable dataset.
+    """
+    joint_embedding = backend.joint_embed(
+        *datasets,
+        output_dim=embedding_dim,
+        **embedding_kwargs,
+    )
+
+    return joint_embedding
+
+
 def run_pipeline(
     *datasets,
     train_idx=None,
