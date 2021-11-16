@@ -1,3 +1,9 @@
+# 1.2.0
+- Update `README.md`
+- Add notebook depth
+ - `anonymize` notebook now includes section on retained statistical efficacy.
+- Re-run notebooks
+
 # 1.1.0
 - Add `anonymize` functionality
 - Add `examples` module for notebook cleanup

@@ -54,14 +54,17 @@ def plot_example_embedding(
         plt.axis(axis_bounds)
 
 
-def plot_example_results(labels, logits, split_idx):
+def plot_example_results(labels, logits, split_idx=None):
     """Plot the results of the mapping"""
     fig, ax = plt.subplots()
     plt.title('Prediction vs Reality')
-    plt.xlabel('True')
+    plt.xlabel('Truth')
     plt.ylabel('Prediction')
-    ax.scatter(labels[:split_idx], logits[:split_idx], color='blue')
-    ax.scatter(labels[split_idx:], logits[split_idx:], color='red')
+    if split_idx is None:
+        ax.scatter(labels, logits, color='green')
+    else:
+        ax.scatter(labels[:split_idx], logits[:split_idx], color='blue')
+        ax.scatter(labels[split_idx:], logits[split_idx:], color='red')
 
     # Make a line y=x
     # https://stackoverflow.com/questions/25497402/adding-y-x-to-a-matplotlib-scatter-plot-if-i-havent-kept-track-of-all-the-data

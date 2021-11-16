@@ -48,7 +48,10 @@ def process_ppp(ppp_data):
     return ppp_data, cols, tags_cols
 
 
-def merge_data(*tagged_datasets):
+def merge_data(
+    *tagged_datasets,
+    agg_by_tag=False,
+):
     """
     Aligns datasets with respect to a chosen column
 
@@ -67,7 +70,8 @@ def merge_data(*tagged_datasets):
     merged = mod1.merge(mod2, left_on=mod1_tags_cols, right_on=mod2_tags_cols, how='inner')
 
     # Limit to 1/region
-    merged = merged.groupby(mod2_tags_cols).mean()
+    if agg_by_tag:
+        merged = merged.groupby(mod2_tags_cols).mean()
 
     mod1 = merged[mod1_cols]
     mod2 = merged[mod2_cols]
