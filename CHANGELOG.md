@@ -7,6 +7,7 @@
 # 1.1.0
 - Add `anonymize` functionality
 - Add `examples` module for notebook cleanup
+ - Includes `equity` module, which is used on decennial and PPP data
 - Additional runs, preprocessing on real data
 - Documentation updates
 
