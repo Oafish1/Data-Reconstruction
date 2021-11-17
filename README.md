@@ -1,7 +1,7 @@
 # Data Reconstruct
 This tool serves to fill in data gaps using auxiliary datasets.  This pipeline is heavily based on the `UnionCom` method which is used outside its original scope of bioinformatics datasets, which is the main contribution of this library.  `UnionCom` mappings are utilized to predict missing data from any number of datasets through the use of a thin neural network present after a joint embedding is generated.
 
-This particular methodology is utilized in the hope that `UnionCom`'s calculation of the `F` matrix approximation (emulation of one modality through the formula `FKF^T`) imbues information about the construction of one modality from the other.  After mapping to a common space, this information would hopefully remain intact, allowing for reconstruction -- even where there wasn't data to begin with.
+This particular methodology is utilized in the hope that `UnionCom`'s calculation of the `F` matrix approximation (emulation of one modality through the formula `FKF^T`) imbues information about the construction of one modality from another.  After mapping to a common space, this information would hopefully remain intact, enough so that we can perform reconstruction -- even where there wasn't data to begin with.
 
 ## Blank Data Reconstruction
 ### Usage

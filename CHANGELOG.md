@@ -1,3 +1,10 @@
+# 1.3.0
+- Additional comparison metrics in `anonymize` notebook
+- Data cleanup and general documentation
+- Additional `utilities` module functions
+- Module cleanup and addition of `defaults`
+- Re-run notebooks
+
 # 1.2.0
 - Update `README.md`
 - Add notebook depth

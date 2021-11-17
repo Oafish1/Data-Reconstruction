@@ -4,19 +4,7 @@ import torch
 
 from . import backend
 from . import model_classes
-
-
-DEFAULT_JOINT_EMBED_KWARGS = {
-    'project_mode': 'tsne',
-    'epoch_pd': 2000,
-    'log_pd': 200,
-    'epoch_DNN': 100,
-    'log_DNN': 50,
-}
-DEFAULT_NN_KWARGS = {
-    'epochs': 100,
-    'log_epoch': 50,
-}
+from .defaults import DEFAULT_JOINT_EMBED_KWARGS, DEFAULT_NN_KWARGS
 
 
 def anonymize(

@@ -1,5 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
+
+from .backend import create_dataloader, train_model
+from .defaults import DEFAULT_NN_KWARGS
+from .model_classes import Model
 
 
 def generate_data(
@@ -75,3 +80,28 @@ def plot_example_results(labels, logits, split_idx=None):
     ax.plot(lims, lims, '-', alpha=0.5, color='green')
     ax.set_xlim(lims)
     ax.set_ylim(lims)
+
+
+def predict_from_data(
+    source,
+    target,
+    split_idx=None,
+    nn_kwargs=DEFAULT_NN_KWARGS,
+):
+    return_split_idx = False
+    if split_idx is None:
+        split_idx = int(.8 * target.shape[0])
+        return_split_idx = True
+
+    training_loader = create_dataloader(source[:split_idx], target[:split_idx])
+    model = Model(source.shape[1], target.shape[1], hidden_dim=20)
+    train_model(model, training_loader, **nn_kwargs)
+    ret = (model(torch.Tensor(source)).detach().numpy(),)
+
+    if return_split_idx:
+        ret += (split_idx,)
+    return _return_tuple(ret)
+
+
+def _return_tuple(tup):
+    return tup[0] if len(tup) == 1 else tup

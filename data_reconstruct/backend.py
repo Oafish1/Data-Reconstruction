@@ -29,7 +29,7 @@ def train_model(
     dataloader,
     criterion=nn.MSELoss(),
     epochs=100,
-    log_epoch=10,
+    log_epoch=50,
     optimizer=torch.optim.AdamW,
 ):
     """Train a ``data_reconstruct.model_classes.Model`` model"""
