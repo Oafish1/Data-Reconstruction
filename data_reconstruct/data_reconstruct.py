@@ -1,5 +1,6 @@
 import warnings
 
+import numpy as np
 import torch
 
 from . import backend
@@ -33,11 +34,16 @@ def anonymize(
 
 def run_pipeline(
     *datasets,
+    column_fill=False,
     train_idx=None,
     validation_idx=None,
     embedding_dim=10,
-    hidden_dim=10,
+    hidden_dim=20,
     output_cols=[0],
+    std_function_and_inv=(
+        lambda x: x,
+        lambda x: x,
+    ),
     embedding_kwargs=DEFAULT_JOINT_EMBED_KWARGS,
     nn_kwargs=DEFAULT_NN_KWARGS,
 ):
@@ -49,6 +55,19 @@ def run_pipeline(
     ``validation_idx`` is the optional # of validation samples.  By default,
         this will be the size of the last dataset
     It is assumed that the datasets are ordered training->validation->to_predict
+
+    ``column_fill``, if True, does not use existing data from column in joint
+        embedding.  Set to False if you are trying to predict entirely missing
+        samples
+    Ex.
+        column_fill = True
+        a b c  1 x 3
+        a b c  1 x 3
+        a b c  1 x 3
+        column_fill = False
+        a b c  1 2 3
+        a b c    x
+        a b c    x
     """
     if train_idx is None:
         train_idx = len(datasets[0])
@@ -65,7 +84,21 @@ def run_pipeline(
 
     # Perform embedding
     embedding_input = [*datasets]
-    embedding_input[-1] = embedding_input[-1][:train_idx]
+    if column_fill:
+        masked_output_cols = np.ma.array(
+            np.arange(embedding_input[-1].shape[1]),
+            mask=False,
+        )
+        for i in output_cols:
+            masked_output_cols.mask[i] = True
+
+        # embedding_input[-1] = embedding_input[-1][
+        #     :,
+        #     masked_output_cols.compressed(),
+        # ]
+
+    else:
+        embedding_input[-1] = embedding_input[-1][:train_idx]
 
     joint_embedding = backend.joint_embed(
         *embedding_input,
@@ -78,6 +111,7 @@ def run_pipeline(
     print('Mapping to last dataset...')
     model_train_X = joint_embedding[0][:train_idx]
     model_train_y = datasets[-1][:train_idx][:, output_cols]
+    model_train_y = std_function_and_inv[0](model_train_y)
 
     training_loader = backend.create_dataloader(model_train_X, model_train_y)
     model = model_classes.Model(embedding_dim, len(output_cols), hidden_dim=hidden_dim)
@@ -90,4 +124,6 @@ def run_pipeline(
         validation_loader = backend.create_dataloader(model_validation_X, model_validation_y)
         backend.run_validation(model, validation_loader)
 
-    return model(torch.Tensor(joint_embedding[0])).detach().numpy()
+    return std_function_and_inv[1](
+        model(torch.Tensor(joint_embedding[0])).detach().numpy()
+    )

@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn import decomposition
 import torch
 
 from .backend import create_dataloader, train_model
@@ -29,22 +30,44 @@ def generate_data(
     return mod1, relationship, mod2, mod2_training, mod2_validation, split_idx
 
 
+def regular_plot(
+    data,
+    dimensions=[0, 1],
+    **plot_kwargs,
+):
+    """Regular plotting utility"""
+    plt.scatter(*np.transpose(data[:, dimensions]), **plot_kwargs)
+
+
+def pca_plot(
+    data,
+    pca=None,
+    **plot_kwargs,
+):
+    """PCA plot utility"""
+    if pca is None:
+        pca = decomposition.PCA(n_components=2)
+        pca.fit(data)
+    plt.scatter(*np.transpose(pca.transform(data)), **plot_kwargs)
+    return pca
+
+
 def plot_example_embedding(
     joint_embedding,
     split_idx,
-    dim_to_plot=[0, 1],
+    dimensions=[0, 1],
     axis_bounds=None,
 ):
     """Plot select dimensions of a joint embedding, includes 'missing' data"""
     plt.subplot(1, 2, 1)
     plt.title('First Modality')
     plt.scatter(
-        *np.transpose(joint_embedding[0][:split_idx, dim_to_plot]),
+        *np.transpose(joint_embedding[0][:split_idx, dimensions]),
         color='blue',
         label='Present Points',
     )
     plt.scatter(
-        *np.transpose(joint_embedding[0][split_idx:, dim_to_plot]),
+        *np.transpose(joint_embedding[0][split_idx:, dimensions]),
         color='red',
         label='Missing Points',
     )
@@ -59,10 +82,11 @@ def plot_example_embedding(
         plt.axis(axis_bounds)
 
 
-def plot_example_results(labels, logits, split_idx=None):
+def plot_example_results(labels, logits, split_idx=None, ax=None):
     """Plot the results of the mapping"""
-    fig, ax = plt.subplots()
-    plt.title('Prediction vs Reality')
+    if ax is None:
+        _, ax = plt.subplots()
+
     plt.xlabel('Truth')
     plt.ylabel('Prediction')
     if split_idx is None:
@@ -86,6 +110,7 @@ def predict_from_data(
     source,
     target,
     split_idx=None,
+    hidden_dim=20,
     nn_kwargs=DEFAULT_NN_KWARGS,
 ):
     return_split_idx = False
@@ -94,7 +119,7 @@ def predict_from_data(
         return_split_idx = True
 
     training_loader = create_dataloader(source[:split_idx], target[:split_idx])
-    model = Model(source.shape[1], target.shape[1], hidden_dim=20)
+    model = Model(source.shape[1], target.shape[1], hidden_dim=hidden_dim)
     train_model(model, training_loader, **nn_kwargs)
     ret = (model(torch.Tensor(source)).detach().numpy(),)
 

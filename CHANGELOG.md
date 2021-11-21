@@ -1,3 +1,19 @@
+# 1.4.0
+## Functions
+- Added `pca_plot` visualization
+- Added `regular_plot` visualization
+- Added optional dropout to `Model`
+- Implemented alternative `run_pipeline` data reconstruction method
+
+## Files
+- Added joint embedding visualization notebook
+- More embedding size examples in anonymization notebook
+- Extended and tweaked `equity` example
+- Notebook reruns
+
+## Miscellaneous
+- QOL tweaks and documentation
+
 # 1.3.0
 - Additional comparison metrics in `anonymize` notebook
 - Data cleanup and general documentation
@@ -8,7 +24,7 @@
 # 1.2.0
 - Update `README.md`
 - Add notebook depth
- - `anonymize` notebook now includes section on retained statistical efficacy.
+ - `anonymize` notebook now includes section on retained statistical efficacy
 - Re-run notebooks
 
 # 1.1.0

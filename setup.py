@@ -13,10 +13,11 @@ setup(
     description=readme,
     test_suite='tests',
     install_requires=[
-        'unioncom',
         'matplotlib',
         'numpy',
+        'sklearn',
         'torch',
+        'unioncom',
     ],
     extras_require={
         'dev': [

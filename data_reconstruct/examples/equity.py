@@ -27,9 +27,23 @@ def process_decennial(decennial_data):
     return decennial_data, cols, tags_cols
 
 
-def process_ppp(ppp_data):
+def process_ppp(ppp_data, extended=True):
     """Perform pre-processing on ppp data"""
     cols = [
+        'CurrentApprovalAmount',
+        'ForgivenessAmount',
+        'UTILITIES_PROCEED',  # Added
+        'PAYROLL_PROCEED',   # Added
+        'MORTGAGE_INTEREST_PROCEED',   # Added
+        'RENT_PROCEED',  # Added
+        'REFINANCE_EIDL_PROCEED',   # Added
+        'HEALTH_CARE_PROCEED',  # Added
+        'DEBT_INTEREST_PROCEED',  # Added
+        # Cause Errors
+        # 'UndisbursedAmount',  # Added
+        # 'MORTGAGE_INTEREST_PROCEED',
+        # 'HEALTH_CARE_PROCEED',
+    ] if extended else [
         'CurrentApprovalAmount',
         'ForgivenessAmount',
         'MORTGAGE_INTEREST_PROCEED',
