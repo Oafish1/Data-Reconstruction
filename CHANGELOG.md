@@ -1,3 +1,11 @@
+# 1.4.1
+# Functions
+- Addition of `process_saipe` to `examples.equity` module
+
+# Files
+- `examples.equity` further extension to `SAIPE` data
+- Notebook reruns
+
 # 1.4.0
 ## Functions
 - Added `pca_plot` visualization
@@ -8,7 +16,7 @@
 ## Files
 - Added joint embedding visualization notebook
 - More embedding size examples in anonymization notebook
-- Extended and tweaked `equity` example
+- Extended and tweaked `examples.equity` module
 - Notebook reruns
 
 ## Miscellaneous

@@ -62,6 +62,35 @@ def process_ppp(ppp_data, extended=True):
     return ppp_data, cols, tags_cols
 
 
+def process_saipe(saipe_data):
+    """Perform pre-processing on saipe data"""
+    cols = [
+        '90% CI Upper Bound', '90% CI Lower Bound',
+        'Poverty Percent, All Ages',
+        'Poverty Estimate, Age 0-17',
+        'Poverty Percent, Age 0-17',
+        'Poverty Estimate, Age 5-17 in Families',
+        'Poverty Percent, Age 5-17 in Families',
+        'Median Household Income',
+    ]
+    tags_cols = ['Name Caps']  # 'st_abbreviation'
+
+    saipe_data_tags = saipe_data[tags_cols]
+    saipe_data = saipe_data.iloc[:, 9:-6]
+    saipe_data = pd.concat([saipe_data_tags, saipe_data], axis=1)
+    dot_to_na = lambda x: x if x != '.' else np.nan  # noqa
+    saipe_data = saipe_data.applymap(dot_to_na).dropna()
+    saipe_data.iloc[:, 1:] = saipe_data.iloc[:, 1:].astype('int32')
+    normalize = lambda df: (df - df.min()) / (df.max() - df.min())  # noqa
+    saipe_data.iloc[:, 1:] = (
+        saipe_data.iloc[:, 1:]
+        .apply(lambda df: np.log(1 + df))
+        .apply(normalize)
+    )
+
+    return saipe_data, cols, tags_cols
+
+
 def merge_data(
     *tagged_datasets,
     agg_by_tag=False,

@@ -52,7 +52,7 @@ anonymize(..., embedding_kwargs=...)
 ### Limitations
 If given sample data and anonymized data from the same pool, it is likely that data reconstruction could be performed similar to `run_pipeline` above.
 
-`anonymize` has the same data constrains as `run_pipeline` above.
+`anonymize` has the same data constraints as `run_pipeline` above.
 
 ## Future Work
 Currently, the `UnionCom` code used is from [caokai1073's repository](https://github.com/caokai1073/UnionCom).  When using 3+ datasets, the last dataset is made to be the 'definitive' one against which many comparisons are made.  A revision similar to that made in [ComManDo](https://github.com/Oafish1/ComManDo) may be performed to change this.  Additionally, `NLMA` mapping could be used for aligned datasets in anonymization.  However, this is purely speculative.
