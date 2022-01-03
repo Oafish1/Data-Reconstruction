@@ -1,3 +1,10 @@
+# 1.4.2
+# Fixes
+- Model `train` and `eval` states now properly instantiated
+
+# Files
+- Notebook reruns on `SAIPE`
+
 # 1.4.1
 # Functions
 - Addition of `process_saipe` to `examples.equity` module

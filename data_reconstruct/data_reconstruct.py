@@ -115,9 +115,11 @@ def run_pipeline(
 
     training_loader = backend.create_dataloader(model_train_X, model_train_y)
     model = model_classes.Model(embedding_dim, len(output_cols), hidden_dim=hidden_dim)
+    model.train()
     backend.train_model(model, training_loader, **nn_kwargs)
 
     # Run validation
+    model.eval()
     if validation_idx is not None:
         model_validation_X = joint_embedding[0][train_idx:validation_idx]
         model_validation_y = datasets[-1][train_idx:validation_idx][:, output_cols]
