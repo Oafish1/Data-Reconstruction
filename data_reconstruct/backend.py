@@ -6,7 +6,7 @@ from unioncom.UnionCom import UnionCom
 from .model_classes import PredictionDataset
 
 
-USE_COMMANDO = False
+USE_COMMANDO = True
 
 
 def joint_embed(*datasets, **hyperparams):

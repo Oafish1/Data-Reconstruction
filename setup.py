@@ -13,6 +13,7 @@ setup(
     description=readme,
     test_suite='tests',
     install_requires=[
+        'commando@git+git://github.com/Oafish1/ComManDo@dd2554d',
         'matplotlib',
         'numpy',
         'sklearn',

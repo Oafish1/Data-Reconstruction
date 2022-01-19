@@ -1,3 +1,6 @@
+# 1.5.0
+- Use updated version of `ComManDo`
+
 # 1.4.2
 # Fixes
 - Model `train` and `eval` states now properly instantiated
