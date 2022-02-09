@@ -35,6 +35,7 @@ def anonymize(
 def run_pipeline(
     *datasets,
     column_fill=False,
+    use_decoder=False,
     train_idx=None,
     validation_idx=None,
     embedding_dim=10,
@@ -68,6 +69,10 @@ def run_pipeline(
         a b c  1 2 3
         a b c    x
         a b c    x
+    ``use_decoder`` disables all column masking and purely attempts to predict
+        a second modality on testing and validation data using only training data.
+        NOTE: ``train_idx`` is used on all datasets when ``use_decoder`` is True
+        NOTE: ComManDo or another decoder model must be used for this method
     """
     if train_idx is None:
         train_idx = len(datasets[0])
@@ -84,24 +89,28 @@ def run_pipeline(
 
     # Perform embedding
     embedding_input = [*datasets]
-    if column_fill:
-        masked_output_cols = np.ma.array(
-            np.arange(embedding_input[-1].shape[1]),
-            mask=False,
-        )
-        for i in output_cols:
-            masked_output_cols.mask[i] = True
+    if not use_decoder:
+        if column_fill:
+            masked_output_cols = np.ma.array(
+                np.arange(embedding_input[-1].shape[1]),
+                mask=False,
+            )
+            for i in output_cols:
+                masked_output_cols.mask[i] = True
 
-        # embedding_input[-1] = embedding_input[-1][
-        #     :,
-        #     masked_output_cols.compressed(),
-        # ]
-
+            embedding_input[-1] = embedding_input[-1][
+                :,
+                masked_output_cols.compressed(),
+            ]
+        else:
+            embedding_input[-1] = embedding_input[-1][:train_idx]
     else:
-        embedding_input[-1] = embedding_input[-1][:train_idx]
+        for i in range(len(embedding_input)):
+            embedding_input[i] = embedding_input[i][:train_idx]
 
     joint_embedding = backend.joint_embed(
         *embedding_input,
+        return_model=use_decoder,
         output_dim=embedding_dim,
         **embedding_kwargs,
     )
@@ -109,23 +118,34 @@ def run_pipeline(
     # Predict last modality
     print('-' * 33)
     print('Mapping to last dataset...')
-    model_train_X = joint_embedding[0][:train_idx]
-    model_train_y = datasets[-1][:train_idx][:, output_cols]
-    model_train_y = std_function_and_inv[0](model_train_y)
+    if use_decoder:
+        print('Using trained model...')
+        _, cc = joint_embedding
+        encoded = (
+            cc.model.encoders[0](
+                torch.tensor(datasets[0]).float()
+            )
+        )
+        print('Done!')
+        return cc.model.decoders[1](encoded).detach().cpu().numpy()
+    else:
+        model_train_X = joint_embedding[0][:train_idx]
+        model_train_y = datasets[-1][:train_idx][:, output_cols]
+        model_train_y = std_function_and_inv[0](model_train_y)
 
-    training_loader = backend.create_dataloader(model_train_X, model_train_y)
-    model = model_classes.Model(embedding_dim, len(output_cols), hidden_dim=hidden_dim)
-    model.train()
-    backend.train_model(model, training_loader, **nn_kwargs)
+        training_loader = backend.create_dataloader(model_train_X, model_train_y)
+        model = model_classes.Model(embedding_dim, len(output_cols), hidden_dim=hidden_dim)
+        model.train()
+        backend.train_model(model, training_loader, **nn_kwargs)
 
-    # Run validation
-    model.eval()
-    if validation_idx is not None:
-        model_validation_X = joint_embedding[0][train_idx:validation_idx]
-        model_validation_y = datasets[-1][train_idx:validation_idx][:, output_cols]
-        validation_loader = backend.create_dataloader(model_validation_X, model_validation_y)
-        backend.run_validation(model, validation_loader)
+        # Run validation
+        model.eval()
+        if validation_idx is not None:
+            model_validation_X = joint_embedding[0][train_idx:validation_idx]
+            model_validation_y = datasets[-1][train_idx:validation_idx][:, output_cols]
+            validation_loader = backend.create_dataloader(model_validation_X, model_validation_y)
+            backend.run_validation(model, validation_loader)
 
-    return std_function_and_inv[1](
-        model(torch.Tensor(joint_embedding[0])).detach().numpy()
-    )
+        return std_function_and_inv[1](
+            model(torch.Tensor(joint_embedding[0])).detach().numpy()
+        )

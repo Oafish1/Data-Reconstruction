@@ -9,13 +9,17 @@ from .model_classes import PredictionDataset
 USE_COMMANDO = True
 
 
-def joint_embed(*datasets, **hyperparams):
+def joint_embed(*datasets, return_model=False, **hyperparams):
     """Perform joint embedding on any number of datasets"""
     if USE_COMMANDO:
         constructor_class = ComManDo
     else:
         constructor_class = UnionCom
-    return constructor_class(**hyperparams).fit_transform([*datasets])
+    model = constructor_class(**hyperparams)
+    ret = model.fit_transform([*datasets])
+    if return_model:
+        return ret, model
+    return ret
 
 
 def create_dataloader(inputs, labels):

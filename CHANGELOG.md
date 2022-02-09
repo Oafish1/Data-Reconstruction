@@ -1,5 +1,8 @@
 # 1.5.0
 - Use updated version of `ComManDo`
+- Add dataset prediction
+- Add dataset prediction notebook
+- Fixed a bug with `column_fill`
 
 # 1.4.2
 # Fixes
